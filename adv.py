@@ -32,10 +32,10 @@ class Graph:
     def add_vertex(self, vertex_id):
         if vertex_id not in self.vertices:
             self.vertices[vertex_id] = {}
-            directions = player.current_room.get_exits()
+            # directions = player.current_room.get_exits()
        
-            for d in directions:
-                graph.vertices[vertex_id][d] = '?'
+            # for d in directions:
+            #     graph.vertices[vertex_id][d] = '?'
 
     def add_edge(self, vertex_id, key, value):
         self.vertices[vertex_id][key] = value
@@ -85,33 +85,33 @@ def reverse_direction(direction):
 
 # additional function that draw new maze - to be fixed !!!
 def draw_graph(current_room, direction, next_room):
-
-    graph.add_vertex(current_room)
     rev_direction = reverse_direction(direction)
-    graph.add_edge(current_room, direction, next_room)
+    
+    graph.add_vertex(current_room)
+    if direction in player.current_room.get_exits():
+        graph.add_edge(current_room, direction, next_room)
     graph.add_vertex(next_room)
+    # if direction in player.current_room.get_exits():
     graph.add_edge(next_room, rev_direction, current_room)
 
 # add first direction from current room direction array, e.g 'n', to traversal_path
 traversal_path = [player.current_room.get_exits()[0]]
 # add first direction from current room direction array, e.g 'n', to the stack
-stack.push([player.current_room.get_exits()[0]])
-
+stack.push(player.current_room.get_exits()[0])
 
 # while stack is not empty we traverse the maze
-
 while stack.size() > 0:
     # get direction from the end of the stack
     move = stack.pop()
     
     ### for draw_graph()
-    cur_room = player.current_room.id
-    
+    cur_room = player.current_room
+    # print("cur_room", cur_room)
     # travel (current room changes)
     player.travel(move)
 
     ### for draw_graph()
-    n_room = player.current_room.id
+    n_room = player.current_room
 
     # check if the current room has not been visited before
     if player.current_room not in visited_rooms:
@@ -127,15 +127,15 @@ while stack.size() > 0:
     for direction in room_directions:
         # set the next room for each direction
         next_room = player.current_room.get_room_in_direction(direction)
+     
+        # print("next_room", next_room.id)
         # if the room has not been visited
-       
-        if next_room is not None and next_room not in visited_rooms:
+        if next_room and next_room not in visited_rooms:
             # append direction to out traversal_path and stack
+            draw_graph(cur_room, direction, next_room)
             traversal_path.append(direction)
             stack.push(direction)
-            draw_graph(cur_room, direction, n_room)
             break
-
 
 print("Traversal_path:", traversal_path)
 print("New graph:", graph.vertices)
@@ -149,8 +149,6 @@ if len(visited_rooms) == len(room_graph):
 else:
     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
     print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
-
-
 
 #######
 # UNCOMMENT TO WALK AROUND

@@ -57,3 +57,7 @@ class Room:
             return None
     def get_coords(self):
         return [self.x, self.y]
+
+    # Print room id
+    def __repr__(self):
+        return str(self.id)
